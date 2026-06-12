@@ -32,6 +32,10 @@ A workspace is the unit of collaboration. Each workspace:
 - Large documents are served to the editor in pages (keyset pagination) so
   the UI can lazy-load instead of fetching the whole corpus at once.
 
+What happens between "user picks a file" and "document ready to annotate":
+
+![Upload and tokenization flow](../assets/diagrams/07-upload-tokenize-flow.png)
+
 ## Annotation
 
 Each annotation type has its own module and endpoints, all operating on

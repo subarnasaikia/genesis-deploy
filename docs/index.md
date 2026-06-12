@@ -6,6 +6,11 @@ resolution**, **named-entity recognition (NER)**, **part-of-speech (POS)
 tagging**, and **word-sense disambiguation (WSD)** — then export the results
 in standard formats such as CoNLL-2012.
 
+The simplest way to picture the system — users, the web app, the API, and
+the data they exchange:
+
+![System context](assets/diagrams/15-dfd-level0-context.png)
+
 The platform is built as two applications plus a database:
 
 | Component | Technology | Role |
@@ -16,6 +21,10 @@ The platform is built as two applications plus a database:
 
 ## How this handbook is organised
 
+- **[User Guide](user-guide.md)** — how to use Genesis, screen by screen,
+  written for annotators with no technical background.
+- **[Repositories](repositories.md)** — the three Git repos, what each
+  one owns, branching rules, and the license.
 - **Backend** — [Architecture](backend/architecture.md) explains how the
   backend is built (modules, layers, events, auth); [Functionality](backend/functionality.md)
   explains what it does (features and flows).

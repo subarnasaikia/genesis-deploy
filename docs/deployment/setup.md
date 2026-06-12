@@ -18,6 +18,8 @@ postgres (internal only)  ←  backend :8080  ←  frontend :3000  ←  users
 PostgreSQL is **not** exposed on the host network; only the backend can
 reach it.
 
+![Deployment diagram](../assets/diagrams/19-deployment-diagram.png)
+
 ## Prerequisites
 
 - git

@@ -27,6 +27,8 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+  - User Guide: user-guide.md
+  - Repositories: repositories.md
   - Backend:
       - Architecture: backend/architecture.md
       - Functionality: backend/functionality.md

@@ -4,6 +4,10 @@ The Genesis backend is a **Spring Boot 3 modular monolith** on **Java 21**,
 built with Maven. It exposes a REST API consumed by the Next.js frontend and
 persists everything in PostgreSQL.
 
+The backend's layered shape at a glance:
+
+![Layered architecture](../assets/diagrams/05-layered-architecture.png)
+
 ## Module structure
 
 The build is a Maven multi-module project. `genesis-api` is the entry point —
@@ -58,6 +62,10 @@ DocumentController
 
 This keeps module boundaries enforceable (verified with ArchUnit tests) and
 makes new annotation types addable without touching existing modules.
+
+The full module dependency and event graph:
+
+![Module dependencies and events](../assets/diagrams/03-module-dependency-events.png)
 
 ## Authentication
 

@@ -53,6 +53,8 @@ server actions and gateways running on the Next.js server. This keeps
 tokens out of browser JavaScript and gives one place to handle errors and
 auth.
 
+![Frontend data flow](../assets/diagrams/14-frontend-data-flow.png)
+
 ## Authentication
 
 - Tokens are held in **HTTP-only cookies** managed server-side

@@ -16,6 +16,12 @@ What a user sees and does in the Genesis web app, journey by journey.
 The root `/` redirects to `/login`; every route under `/home` and
 `/workspace` requires a signed-in session.
 
+![Navigation map](../assets/diagrams/13-frontend-navigation.png)
+
+!!! tip "Looking for a non-technical walkthrough?"
+    The [User Guide](../user-guide.md) covers the same screens with
+    annotated screenshots, written for annotators rather than developers.
+
 ## Getting in
 
 1. **Sign up** with email and password (validated client- and server-side).
