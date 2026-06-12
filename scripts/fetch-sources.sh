@@ -6,12 +6,19 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-# Load .env if present (CI sets the variables directly instead).
+# Load .env if present — but variables already set in the environment
+# (e.g. by CI) take precedence over .env values.
 if [ -f .env ]; then
+  _backend="${BACKEND_REPO_URL:-}"
+  _frontend="${FRONTEND_REPO_URL:-}"
+  _branch="${DEPLOY_BRANCH:-}"
   set -a
   # shellcheck disable=SC1091
   source .env
   set +a
+  [ -n "$_backend" ]  && BACKEND_REPO_URL="$_backend"
+  [ -n "$_frontend" ] && FRONTEND_REPO_URL="$_frontend"
+  [ -n "$_branch" ]   && DEPLOY_BRANCH="$_branch"
 fi
 
 : "${BACKEND_REPO_URL:?BACKEND_REPO_URL must be set (in .env or the environment)}"
