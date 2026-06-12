@@ -1,0 +1,56 @@
+# Full-stack smoke test: prove that "clone this repo, run the pipeline,
+# everything works" — the exact same scripts the VM uses.
+#
+# Repository settings needed:
+#   Variables: BACKEND_REPO_URL, FRONTEND_REPO_URL  (https URLs)
+#   Secrets:   REPO_TOKEN — a PAT with read access to both app repos
+#              (only needed while they are private).
+name: ci
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ["docs/**", "mkdocs.yml", "**.md"]
+  workflow_dispatch:
+
+jobs:
+  build-stack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare env
+        run: |
+          cp config/.env.example .env
+          # CI-safe values for required variables (never real credentials).
+          sed -i 's|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=ci-only-password|' .env
+          sed -i "s|^JWT_SECRET=.*|JWT_SECRET=$(openssl rand -base64 48 | tr -d '\n=')|" .env
+          sed -i 's|^CLOUDINARY_CLOUD_NAME=.*|CLOUDINARY_CLOUD_NAME=ci-placeholder|' .env
+          sed -i 's|^CLOUDINARY_API_KEY=.*|CLOUDINARY_API_KEY=ci-placeholder|' .env
+          sed -i 's|^CLOUDINARY_API_SECRET=.*|CLOUDINARY_API_SECRET=ci-placeholder|' .env
+
+      - name: Fetch sources
+        env:
+          REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
+          BACKEND_REPO_URL: ${{ vars.BACKEND_REPO_URL }}
+          FRONTEND_REPO_URL: ${{ vars.FRONTEND_REPO_URL }}
+        run: |
+          # Inject the PAT for private repos (no-op for public ones).
+          if [ -n "$REPO_TOKEN" ]; then
+            git config --global url."https://x-access-token:${REPO_TOKEN}@github.com/".insteadOf "https://github.com/"
+          fi
+          export BACKEND_REPO_URL FRONTEND_REPO_URL
+          ./scripts/fetch-sources.sh
+
+      - name: Build images
+        run: docker compose -f docker/docker-compose.yml --env-file .env build
+
+      - name: Start stack
+        run: docker compose -f docker/docker-compose.yml --env-file .env up -d
+
+      - name: Healthcheck
+        run: ./scripts/healthcheck.sh
+
+      - name: Logs on failure
+        if: failure()
+        run: docker compose -f docker/docker-compose.yml --env-file .env logs --tail 200

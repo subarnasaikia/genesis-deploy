@@ -1,0 +1,14 @@
+# Filled-in environment — never commit credentials
+.env
+
+# App repos checked out by scripts/fetch-sources.sh
+sources/
+
+# Runtime logs persisted from the backend container
+logs/
+
+# MkDocs build output
+site/
+
+# OS noise
+.DS_Store
