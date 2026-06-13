@@ -8,6 +8,18 @@
 
 name: genesis
 
+# Cap container (json-file) log growth on every service. Docker's default
+# json-file driver has no size limit, so stdout/stderr logs grow unbounded and
+# eventually fill the host disk on a long-lived deploy. This holds each service
+# to ~50 MB (5 rotated files x 10 MB), auto-pruned. Read live with
+# `docker compose ... logs -f <service>`. (The backend ALSO writes a separate
+# rolling file to ./logs/genesis.log, capped in its own logback config.)
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
 services:
   postgres:
     image: postgres:16-alpine
@@ -26,6 +38,7 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
+    logging: *default-logging
 
   backend:
     build:
@@ -69,6 +82,7 @@ services:
       retries: 10
       start_period: 90s
     restart: unless-stopped
+    logging: *default-logging
 
   frontend:
     build:
@@ -86,6 +100,7 @@ services:
       backend:
         condition: service_healthy
     restart: unless-stopped
+    logging: *default-logging
 
 volumes:
   pgdata:

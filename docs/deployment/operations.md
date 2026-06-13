@@ -16,8 +16,28 @@ dc logs -f frontend
 dc logs --tail 100 postgres
 ```
 
-The backend additionally writes a rolling file log to `./logs/genesis.log`
-(rotated daily, 30 days kept) — useful after a container has been removed.
+### Log files & retention
+
+There are **two independent log stores**, both size-bounded and self-pruning —
+**no manual cleanup is needed**:
+
+| Store | What it is | Cap / retention | Configured in |
+|---|---|---|---|
+| **Container logs** | stdout/stderr of every service (what `dc logs` reads) | json-file driver, ~50 MB per service (5 × 10 MB, rotated) | `docker/docker-compose.yml` |
+| **Backend file log** | `./logs/genesis.log` on the host (prod profile only) | rolls daily **and** at 50 MB, keeps 30 days, hard cap 2 GB total | backend `logback-spring.xml` |
+
+The backend file log is bind-mounted from the container (`./logs:/app/logs`), so
+it survives container rebuilds and is handy for `grep`/`tail` after a container
+has been removed:
+
+```bash
+tail -f logs/genesis.log
+ls logs/                   # genesis.log + dated, size-indexed archives
+```
+
+Both stores rotate and delete their own oldest files, so disk usage stays
+bounded without a cron job. If you ever need to reclaim space from *old image
+layers* (not logs), `docker system prune` is safe.
 
 ## Update to a new release
 
