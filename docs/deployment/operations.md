@@ -97,5 +97,6 @@ reboots once Docker starts.
 | Backend unhealthy, logs show JWT error | `JWT_SECRET` missing or shorter than 32 chars |
 | Backend unhealthy, logs show CORS error at boot | `CORS_ALLOWED_ORIGINS` unset (required in prod) |
 | Browser shows network errors calling the API | `NEXT_PUBLIC_API_URL` wrong or backend port blocked by firewall — remember it's evaluated in the browser |
-| Login works but uploads fail | Cloudinary credentials wrong, or file exceeds the 25 MB action limit |
+| Login works but uploads fail | With `STORAGE_PROVIDER=cloudinary`: Cloudinary credentials wrong. With `local`: the `data/uploads` volume isn't writable. Or the file exceeds the 25 MB action limit |
+| Uploads succeed but tokenization fails (`local` provider) | The `data/uploads` volume isn't persistent or is shared across multiple backend instances — `local` needs a single instance on durable storage |
 | Frontend rebuilt but old API URL persists | `NEXT_PUBLIC_API_URL` is baked at build time — rerun `deploy.sh` after changing it (it rebuilds the image) |
