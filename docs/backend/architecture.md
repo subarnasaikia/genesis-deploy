@@ -29,7 +29,7 @@ together, and contains no business logic of its own.
 | `genesis-recommend` | Annotation recommendations |
 | `genesis-import-export` | TXT / CoNLL-2012 import and export |
 | `genesis-logging` | Structured logging support |
-| `genesis-infra` | Database config, file storage (Cloudinary), cross-cutting infrastructure |
+| `genesis-infra` | Database config, pluggable file storage (Cloudinary or local disk), cross-cutting infrastructure |
 
 ## Layering inside each module
 
@@ -91,8 +91,10 @@ The full module dependency and event graph:
   `prod` profile; the `dev` profile may use `ddl-auto=update` for speed.
 - Connection pooling via HikariCP with conservative pool sizes suitable for
   a single-VM deployment.
-- Uploaded source files are stored in Cloudinary; the database stores
-  metadata, tokens, sentences, and annotations.
+- Uploaded source files go to the configured storage backend — Cloudinary or
+  the local filesystem (`STORAGE_PROVIDER`); the database stores metadata,
+  tokens, sentences, and annotations. After tokenization the source is read
+  only for re-tokenizing, so `STORAGE_RETAIN_SOURCE=false` can reclaim it.
 
 ## Configuration
 
@@ -103,7 +105,10 @@ All configuration is environment-driven (12-factor). The important variables:
 | `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` | PostgreSQL connection |
 | `JWT_SECRET` | Token signing key (≥ 32 chars, required) |
 | `JWT_ACCESS_TOKEN_EXPIRY`, `JWT_REFRESH_TOKEN_EXPIRY` | Optional, Spring Duration strings |
-| `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | File storage |
+| `STORAGE_PROVIDER` | `cloudinary` (default) or `local` |
+| `STORAGE_RETAIN_SOURCE` | Keep the raw upload after tokenization (default `true`) |
+| `STORAGE_LOCAL_BASE_PATH` | Upload directory for the `local` provider (default `./data/uploads`) |
+| `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | File storage — required only when `STORAGE_PROVIDER=cloudinary` |
 | `CORS_ALLOWED_ORIGINS` | Allowed frontend origins — required in prod |
 | `SPRING_PROFILES_ACTIVE` | `dev` or `prod` |
 | `PORT` | HTTP port (default 8080) |

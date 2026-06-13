@@ -50,7 +50,8 @@ Edit `.env` and set every REQUIRED value:
 | `DEPLOY_BRANCH` | `uni-prod` (default) |
 | `POSTGRES_PASSWORD` | A strong generated password |
 | `JWT_SECRET` | Output of `openssl rand -base64 48 \| tr -d '\n='` — generate fresh, never reuse a dev value |
-| `CLOUDINARY_*` | Your Cloudinary account credentials |
+| `STORAGE_PROVIDER` | `cloudinary` (default) or `local`. `local` keeps uploads on disk — no Cloudinary account needed |
+| `CLOUDINARY_*` | Cloudinary account credentials — **only required when `STORAGE_PROVIDER=cloudinary`**; leave blank for `local` |
 | `CORS_ALLOWED_ORIGINS` | The URL users will open in their browser, e.g. `http://annotate.example.edu:3000` |
 | `NEXT_PUBLIC_API_URL` | The backend URL as seen **from the browser**, e.g. `http://annotate.example.edu:8080` |
 
@@ -58,6 +59,20 @@ Edit `.env` and set every REQUIRED value:
     `CORS_ALLOWED_ORIGINS` and `NEXT_PUBLIC_API_URL` are evaluated in the
     user's browser, not inside Docker. Use the hostname/IP users actually
     type, and make sure the host firewall allows the two ports.
+
+!!! tip "Choosing a storage provider"
+    **`cloudinary`** (default) uploads raw files to Cloudinary — durable and
+    external, best when the host disk is ephemeral or you run more than one
+    backend instance.
+
+    **`local`** writes uploads to a disk volume (`STORAGE_LOCAL_BASE_PATH`,
+    default `/app/data/uploads`, persisted in `docker/docker-compose.yml`). No
+    Cloudinary account required, but the volume must be durable and the stack
+    must run as a single backend instance.
+
+    Set `STORAGE_RETAIN_SOURCE=false` to delete each raw upload once it has been
+    tokenized — the editor, annotation, and export all read from the database, so
+    only *re-tokenizing from the original* is lost. Defaults to `true` (kept).
 
 ## Step 2 — deploy
 
