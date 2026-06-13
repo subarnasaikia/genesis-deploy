@@ -20,6 +20,24 @@ This repo contains **no application source code**. It owns three things:
    both app repos at their `uni-prod` branches, builds Docker images, and
    starts the full stack with one command.
 
+## The three repositories
+
+Genesis is developed and deployed from three repositories, each with a single
+responsibility:
+
+| Repository | Role |
+|---|---|
+| [`subarnasaikia/genesis`](https://github.com/subarnasaikia/genesis) | **Backend** — Spring Boot API: auth, workspaces, annotation, notifications, import/export, PostgreSQL. |
+| [`gautam84/genesis-frontend`](https://github.com/gautam84/genesis-frontend) | **Frontend** — Next.js 15 web client; talks only to the backend API. |
+| [`subarnasaikia/genesis-deploy`](https://github.com/subarnasaikia/genesis-deploy) | **Deployment** — this repo: pipeline, config, and the documentation handbook. No application code. |
+
+The two app repos each use **`main`** (latest reviewed state) and **`uni-prod`**
+(exactly what runs in production); this repo builds their `uni-prod` branches.
+
+![System architecture](docs/assets/diagrams/02-system-architecture.png)
+
+Full detail and workflow rules: [Repositories](https://subarnasaikia.github.io/genesis-deploy/repositories/).
+
 ## Quick start
 
 Prerequisites: git, Docker Engine, Docker Compose plugin.
@@ -62,6 +80,10 @@ The app repos are checked out into a git-ignored `sources/` directory by
 `fetch-sources.sh`; each app's own `Dockerfile` (maintained in its repo) is
 used to build its image.
 
+The deployed system's shape on the host:
+
+![Deployment topology](docs/assets/diagrams/19-deployment-diagram.png)
+
 ## Updating production
 
 ```bash
@@ -75,6 +97,11 @@ push, and run `./scripts/deploy.sh` again.
 
 ## Documentation site
 
-The full handbook (architecture, functionality, deployment, operations) is
-served from GitHub Pages and rebuilt automatically on every change to
-`docs/`. See `.github/workflows/pages.yml`.
+The full handbook (user guide, backend & frontend architecture and
+functionality, deployment, operations) is served from GitHub Pages and rebuilt
+automatically on every change to `docs/` (see `.github/workflows/pages.yml`):
+
+> **<https://subarnasaikia.github.io/genesis-deploy/>**
+
+Source lives in `docs/` (built with `mkdocs-material`); run `mkdocs serve`
+locally to preview.
