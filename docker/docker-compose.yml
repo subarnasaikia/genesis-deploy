@@ -94,6 +94,13 @@ services:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:?NEXT_PUBLIC_API_URL must be set in .env}
     environment:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+      # Server-side calls (login/signup server actions, middleware token
+      # refresh, RSC serverFetch, export proxy) run INSIDE this container, where
+      # the browser-facing NEXT_PUBLIC_API_URL (e.g. http://localhost:8080)
+      # points at the host, not the backend. Reach Spring by its compose service
+      # name instead. Runtime-only (not a NEXT_PUBLIC_ build arg), so no rebuild
+      # is needed to change it.
+      INTERNAL_API_URL: ${INTERNAL_API_URL:-http://backend:8080}
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     depends_on:
